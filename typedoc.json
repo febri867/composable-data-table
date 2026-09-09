@@ -1,0 +1,17 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["src/index.ts"],
+  "entryPointStrategy": "resolve",
+  "out": "docs/api",
+  "plugin": [],
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "categorizeByGroup": true,
+  "sort": ["kind", "alphabetical"],
+  "readme": "none",
+  "includeVersion": true,
+  "navigation": {
+    "includeGroups": true,
+    "includeCategories": true
+  }
+}

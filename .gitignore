@@ -1,0 +1,15 @@
+node_modules
+dist
+coverage
+storybook-static
+.DS_Store
+*.local
+
+artifacts
+*.tgz
+
+# Local secrets
+.env
+.env.local
+.env.*.local
+.publish-tmp/

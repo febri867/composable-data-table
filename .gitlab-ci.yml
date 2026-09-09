@@ -1,0 +1,57 @@
+image: node:22
+
+stages:
+  - quality
+  - package
+  - publish
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - node_modules/
+
+install:
+  stage: quality
+  script:
+    - npm install --no-audit --no-fund
+  artifacts:
+    paths:
+      - node_modules/
+    expire_in: 1 hour
+
+quality:
+  stage: quality
+  needs: [install]
+  script:
+    - npm run typecheck
+    - npm run lint
+    - npm test
+    - npm run build
+
+package:
+  stage: package
+  needs: [install]
+  script:
+    - npm run build:package
+    - npm pack --pack-destination artifacts
+  artifacts:
+    paths:
+      - artifacts/*.tgz
+      - dist/
+    expire_in: 30 days
+
+publish:npm:
+  stage: publish
+  needs: [quality, package]
+  rules:
+    - if: '$CI_COMMIT_TAG'
+  script:
+    - npm run publish:npm
+
+publish:gitlab:
+  stage: publish
+  needs: [quality, package]
+  rules:
+    - if: '$CI_COMMIT_TAG'
+  script:
+    - npm run publish:gitlab

@@ -1,0 +1,9 @@
+# This file is documentation only. Do not commit real credentials.
+# The release helper creates an ephemeral user config at publish time.
+
+# npmjs:
+# //registry.npmjs.org/:_authToken=${NPM_TOKEN}
+
+# GitLab project registry:
+# //gitlab.com/api/v4/projects/${GITLAB_PROJECT_ID}/packages/npm/:_authToken=${GITLAB_TOKEN}
+# registry=https://gitlab.com/api/v4/projects/${GITLAB_PROJECT_ID}/packages/npm/

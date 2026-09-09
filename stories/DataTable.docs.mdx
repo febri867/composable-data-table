@@ -1,0 +1,35 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title="Documentation/Composable Data Table" />
+
+# Composable Data Table
+
+The application has a production-facing interactive documentation route at **`/docs`**. Storybook remains the isolated component development environment.
+
+## Mental model
+
+```text
+DataTable.Root
+├── DataTable.Header
+│   └── DataTable.Toolbar
+│       ├── DataTable.Search
+│       └── DataTable.Actions
+│           ├── DataTable.Filter / FacetedFilter
+│           └── DataTable.ViewOptions
+├── DataTable.Table
+├── DataTable.InfiniteScroll
+└── DataTable.Footer
+    └── DataTable.Pagination
+```
+
+## Design principles
+
+1. The root owns one TanStack Table instance.
+2. Child components consume shared state through `useDataTable()`.
+3. Product-specific UI remains outside the core component.
+4. Manual/server-side state is supported through controlled TanStack state.
+5. Network/cache behavior is not embedded in the table.
+
+## Full API
+
+See `docs/API.md` in the repository or open `/docs#api` in the application.
