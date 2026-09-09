@@ -1,7 +1,7 @@
 {
   "name": "coconut-composable-data-table",
   "private": false,
-  "version": "0.1.9",
+  "version": "0.1.10",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -28,14 +28,14 @@
     "publish:check": "node scripts/publish.mjs check"
   },
   "dependencies": {
-    "lucide-react": "^0.468.0"
+    "@tanstack/react-table": "8.21.3",
+    "lucide-react": "0.468.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
     "@storybook/addon-a11y": "^9.1.0",
     "@storybook/addon-docs": "^9.1.0",
     "@storybook/react-vite": "^9.1.0",
-    "@tanstack/react-table": "^8.21.3",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
@@ -59,7 +59,7 @@
     "vite": "^6.0.5",
     "vitest": "^3.2.4"
   },
-  "description": "Composable, accessible React data table primitives built on TanStack Table.",
+  "description": "Composable, accessible React data table primitives.",
   "license": "MIT",
   "sideEffects": [
     "dist/styles.css"
@@ -89,15 +89,13 @@
   },
   "peerDependencies": {
     "react": ">=18.2.0 <20",
-    "react-dom": ">=18.2.0 <20",
-    "@tanstack/react-table": ">=8.20.0 <9"
+    "react-dom": ">=18.2.0 <20"
   },
   "keywords": [
     "react",
     "typescript",
     "data-table",
     "table",
-    "tanstack-table",
     "component-library",
     "headless",
     "composable",

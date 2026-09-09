@@ -5,7 +5,9 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   resolve: {
-    alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
   },
   build: {
     lib: {
@@ -15,7 +17,7 @@ export default defineConfig({
       cssFileName: 'styles',
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'react/jsx-runtime', '@tanstack/react-table', 'lucide-react'],
+      external: ['react', 'react-dom', 'react/jsx-runtime'],
     },
     sourcemap: true,
     emptyOutDir: false,

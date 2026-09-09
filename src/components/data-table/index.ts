@@ -1,5 +1,9 @@
 export { Root } from './core'
-export type { DataTableRootProps, DataTableInitialState } from './core'
+export type {
+  DataTableRootProps,
+  DataTableInitialState,
+  DataTableColumn,
+} from './core'
 
 export { Fullscreen, FullscreenButton } from './fullscreen'
 export type {

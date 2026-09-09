@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented here.
 
+## [0.1.10]
+
+### Fixed
+- Expanded the README with installation, column definitions, composition, filtering, sorting, pagination, server-side usage, selection, visibility, pinning, resizing, expandable rows, loading, empty states, fullscreen, export, controlled state, and public props.
+
 ## [0.1.9]
 
 ### Fixed

@@ -34,13 +34,14 @@ export type DataTableInitialState = Partial<Omit<TableState, 'pagination'>> & {
   pagination?: Partial<PaginationState>
 }
 
+export type DataTableColumn<TData extends RowData> = ColumnDef<TData>
+
 export type DataTableRootProps<TData extends RowData> = {
   data: TData[]
   // TanStack's TValue parameter is intentionally bivariant/invariant; a table can
   // contain heterogeneous accessor value types, so the public boundary uses any.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  columns: ColumnDef<TData, any>[]
-  children: React.ReactNode
+  columns: DataTableColumn<TData>[]
+  children?: React.ReactNode
   className?: string
   initialState?: DataTableInitialState
   state?: Partial<TableState>

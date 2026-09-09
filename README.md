@@ -1,148 +1,195 @@
 # Coconut Composable Data Table
 
-A reusable and composable data table built with React, TypeScript, and TanStack Table.
+A flexible and composable data table for React applications.
 
-The project focuses on building a table system from small, reusable primitives rather than a single component with a large configuration API.
+The table is built from small components, so you can use only the features your application needs.
 
-## Overview
-
-The table is built around a shared TanStack Table instance and can be composed with only the features an application needs.
-
-For example:
-
-```tsx
-<DataTable.Root data={data} columns={columns} enableRowSelection>
-  <DataTable.Header>
-    <DataTable.Toolbar>
-      <DataTable.Search />
-
-      <DataTable.Actions>
-        <DataTable.FacetedFilter columnId="status" />
-        <DataTable.ViewOptions />
-      </DataTable.Actions>
-    </DataTable.Toolbar>
-  </DataTable.Header>
-
-  <DataTable.Table stickyHeader />
-
-  <DataTable.Footer>
-    <DataTable.Pagination />
-  </DataTable.Footer>
-</DataTable.Root>
-```
-
-Additional controls can access the same table instance through `useDataTable()` without modifying the table core.
-
-## Demo & Documentation
-
-The repository includes:
-
-- **Demo** — a reference implementation showing the main table features.
-- **Docs** — interactive examples and usage documentation.
-- **Storybook** — isolated component development and testing.
-
-When running locally:
-
-```text
-http://localhost:5173/
-http://localhost:5173/docs
-```
-
-Start Storybook with:
+## Installation
 
 ```bash
-npm run storybook
+npm install coconut-composable-data-table
 ```
 
-## Documentation Map
-
-The repository keeps different types of documentation separate so each file has a clear purpose.
-
-| File | Purpose |
-| --- | --- |
-| `README.md` | Project overview, setup, features, and basic usage |
-| `SUBMISSION.md` | Submission notes, reviewer path, and main design decisions |
-| `CHANGELOG.md` | Release and change history |
-| `docs/API.md` | Public component API and usage details |
-| `docs/ARCHITECTURE.md` | Component structure, state ownership, and architecture decisions |
-| `docs/CONTRIBUTING.md` | Development workflow and contribution guidelines |
-| `docs/PUBLISHING.md` | Package build and npm/GitLab publishing workflow |
-
-## Features
-
-### Table
-
-- Type-safe column definitions
-- Sorting
-- Multi-column sorting
-- Global search
-- Column filtering
-- Faceted filtering
-- Pagination
-- Infinite scroll
-- Row selection
-- Column visibility
-- Column pinning
-- Column ordering
-- Grouping
-- Expandable rows
-- Sticky headers
-
-### UI
-
-- Loading state
-- Empty state
-- Skeleton rows
-- Striped rows
-- Density options
-- Fullscreen workspace
-- CSV export
-- Row actions
-- Responsive controls
-- Keyboard-friendly interactions
-- Focus management
-
-### State
-
-The table supports both uncontrolled and controlled state.
-
-Supported controlled state includes:
-
-- Sorting
-- Global filtering
-- Column filtering
-- Pagination
-- Row selection
-- Column visibility
-- Column ordering
-- Column pinning
-- Grouping
-- Expanded rows
-
-Server-side/manual modes are also supported for sorting, filtering, and pagination.
-
-## Why Composition?
-
-A common approach is to expose most functionality through boolean props:
+Import the stylesheet once in your application:
 
 ```tsx
-<DataTable
-  searchable
-  sortable
-  filterable
-  pagination
-  selectable
-  showColumnPicker
-  ...
-/>
+import 'coconut-composable-data-table/styles.css'
 ```
 
-This can become difficult to extend as the number of features grows.
-
-This project instead exposes smaller primitives:
+Then import the table components:
 
 ```tsx
-<DataTable.Root data={data} columns={columns}>
+import {
+  DataTable,
+  type DataTableColumn,
+} from 'coconut-composable-data-table'
+```
+
+## Basic Usage
+
+Only `data` and `columns` are required.
+
+```tsx
+import 'coconut-composable-data-table/styles.css'
+
+import {
+  DataTable,
+  type DataTableColumn,
+} from 'coconut-composable-data-table'
+
+type User = {
+  id: string
+  name: string
+  email: string
+  role: string
+}
+
+const columns: DataTableColumn<User>[] = [
+  {
+    accessorKey: 'name',
+    header: 'Name',
+  },
+  {
+    accessorKey: 'email',
+    header: 'Email',
+  },
+  {
+    accessorKey: 'role',
+    header: 'Role',
+  },
+]
+
+const users: User[] = [
+  {
+    id: '1',
+    name: 'John Doe',
+    email: 'john@example.com',
+    role: 'Admin',
+  },
+  {
+    id: '2',
+    name: 'Jane Doe',
+    email: 'jane@example.com',
+    role: 'User',
+  },
+]
+
+export function UsersTable() {
+  return (
+    <DataTable.Root data={users} columns={columns}>
+      <DataTable.Table />
+    </DataTable.Root>
+  )
+}
+```
+
+## Columns
+
+Columns define how your data is displayed.
+
+### Basic column
+
+```tsx
+const columns: DataTableColumn<User>[] = [
+  {
+    accessorKey: 'name',
+    header: 'Name',
+  },
+  {
+    accessorKey: 'email',
+    header: 'Email',
+  },
+]
+```
+
+### Custom column ID
+
+Use `id` when a column does not directly map to a property in your data.
+
+```tsx
+const columns: DataTableColumn<User>[] = [
+  {
+    id: 'actions',
+    header: 'Actions',
+    cell: ({ row }) => (
+      <button
+        type="button"
+        onClick={() => console.log(row.original)}
+      >
+        Edit
+      </button>
+    ),
+  },
+]
+```
+
+### Custom cell
+
+```tsx
+const columns: DataTableColumn<User>[] = [
+  {
+    accessorKey: 'name',
+    header: 'Name',
+    cell: ({ row }) => (
+      <strong>{row.original.name}</strong>
+    ),
+  },
+]
+```
+
+### Custom header
+
+```tsx
+const columns: DataTableColumn<User>[] = [
+  {
+    accessorKey: 'name',
+    header: 'User Name',
+  },
+]
+```
+
+### Column width
+
+```tsx
+const columns: DataTableColumn<User>[] = [
+  {
+    accessorKey: 'name',
+    header: 'Name',
+    size: 240,
+  },
+]
+```
+
+### Enable filtering
+
+```tsx
+const columns: DataTableColumn<User>[] = [
+  {
+    accessorKey: 'name',
+    header: 'Name',
+    filterFn: 'includesString',
+  },
+]
+```
+
+### Enable sorting
+
+```tsx
+const columns: DataTableColumn<User>[] = [
+  {
+    accessorKey: 'name',
+    header: 'Name',
+    enableSorting: true,
+  },
+]
+```
+
+## Composition
+
+The table is designed to be composed from small components.
+
+```tsx
+<DataTable.Root data={users} columns={columns}>
   <DataTable.Header>
     <DataTable.Toolbar>
       <DataTable.Search />
@@ -158,43 +205,11 @@ This project instead exposes smaller primitives:
 </DataTable.Root>
 ```
 
-This makes individual features optional and allows applications to provide their own controls when needed.
+You can add or remove features without changing the table's core component.
 
-## Basic Usage
+## Search
 
-```tsx
-import { createColumnHelper } from '@tanstack/react-table'
-import { DataTable } from '@/components/data-table'
-
-type User = {
-  id: string
-  name: string
-  role: string
-}
-
-const columnHelper = createColumnHelper<User>()
-
-const columns = [
-  columnHelper.accessor('name', {
-    header: 'Name',
-  }),
-  columnHelper.accessor('role', {
-    header: 'Role',
-  }),
-]
-
-export function UsersTable({ users }: { users: User[] }) {
-  return (
-    <DataTable.Root data={users} columns={columns}>
-      <DataTable.Table />
-    </DataTable.Root>
-  )
-}
-```
-
-## Search & Filtering
-
-Global search:
+Add global search:
 
 ```tsx
 <DataTable.Root data={users} columns={columns}>
@@ -208,34 +223,77 @@ Global search:
 </DataTable.Root>
 ```
 
-Column filtering can be configured through the column definition:
+Customize the search input:
 
 ```tsx
-const columns = [
-  columnHelper.accessor('name', {
-    header: 'Name',
-    filterFn: 'includesString',
-  }),
-  columnHelper.accessor('role', {
-    header: 'Role',
-    filterFn: 'includesString',
-  }),
-]
+<DataTable.Search placeholder="Search users..." />
 ```
 
-For columns with a known set of values, faceted filtering can be added:
+Search a specific column:
 
 ```tsx
-<DataTable.FacetedFilter columnId="status" />
+<DataTable.Search
+  columnId="name"
+  placeholder="Search names..."
+/>
+```
+
+## Filtering
+
+Column filtering:
+
+```tsx
+<DataTable.ColumnFilter columnId="role" />
+```
+
+Filter input:
+
+```tsx
+<DataTable.Filter columnId="name" />
+```
+
+Filter row:
+
+```tsx
+<DataTable.FilterRow />
+```
+
+Clear active filters:
+
+```tsx
+<DataTable.ClearFilters />
+```
+
+## Faceted Filtering
+
+For columns with a known set of values:
+
+```tsx
+<DataTable.FacetedFilter
+  columnId="role"
+  label="Role"
+/>
 ```
 
 ## Sorting
 
-Sorting is handled by TanStack Table and can be enabled through the column configuration and table controls.
+A sortable column can use the sort button in its header:
 
-A sortable column can define its header and participate in single or multi-column sorting.
+```tsx
+const columns: DataTableColumn<User>[] = [
+  {
+    accessorKey: 'name',
+    header: () => (
+      <DataTable.SortButton
+        columnId="name"
+        label="Name"
+      />
+    ),
+  },
+]
+```
 
-The table can also expose sorting state to the consuming application:
+Sorting state can also be controlled:
 
 ```tsx
 <DataTable.Root
@@ -250,19 +308,16 @@ The table can also expose sorting state to the consuming application:
 
 ## Pagination
 
-Client-side pagination:
+Add pagination:
 
 ```tsx
-<DataTable.Root
-  data={users}
-  columns={columns}
->
+<DataTable.Root data={users} columns={columns}>
   <DataTable.Table />
   <DataTable.Pagination />
 </DataTable.Root>
 ```
 
-Page size options can be configured:
+Customize page sizes:
 
 ```tsx
 <DataTable.Pagination
@@ -270,75 +325,69 @@ Page size options can be configured:
 />
 ```
 
+Hide page size selection:
+
+```tsx
+<DataTable.Pagination showPageSize={false} />
+```
+
+Hide page numbers:
+
+```tsx
+<DataTable.Pagination showPageNumbers={false} />
+```
+
 ## Server-side Pagination
 
-Pagination state can be controlled by the consuming application:
+Use `manualPagination` when pagination is handled by your application or API.
 
 ```tsx
 <DataTable.Root
-  data={page.rows}
+  data={users}
   columns={columns}
+  manualPagination
+  rowCount={totalUsers}
   state={{ pagination }}
   onPaginationChange={setPagination}
-  manualPagination
-  rowCount={page.total}
 >
-  <DataTable.Table loading={isFetching} />
+  <DataTable.Table loading={loading} />
   <DataTable.Pagination />
 </DataTable.Root>
 ```
 
-The table does not perform data fetching or caching itself. Those responsibilities remain with the consuming application.
+The table does not perform network requests. Your application remains responsible for fetching data.
 
-## Server-side Sorting & Filtering
-
-Sorting and filtering can also be controlled when the data comes from an API:
+## Server-side Sorting
 
 ```tsx
 <DataTable.Root
-  data={query.data?.rows ?? []}
+  data={users}
   columns={columns}
-  state={{
-    sorting,
-    columnFilters,
-    pagination,
-  }}
-  onSortingChange={setSorting}
-  onColumnFiltersChange={setColumnFilters}
-  onPaginationChange={setPagination}
   manualSorting
-  manualFiltering
-  manualPagination
-  rowCount={query.data?.total ?? 0}
+  state={{ sorting }}
+  onSortingChange={setSorting}
 >
-  <DataTable.Table loading={query.isFetching} />
-  <DataTable.Pagination />
+  <DataTable.Table />
 </DataTable.Root>
 ```
 
-This keeps the table UI independent from the application's networking or query layer.
-
-## Infinite Scroll
-
-Infinite scrolling is available as a separate primitive:
+## Server-side Filtering
 
 ```tsx
-<DataTable.Root data={rows} columns={columns}>
+<DataTable.Root
+  data={users}
+  columns={columns}
+  manualFiltering
+  state={{ columnFilters }}
+  onColumnFiltersChange={setColumnFilters}
+>
   <DataTable.Table />
-
-  <DataTable.InfiniteScroll
-    hasMore={hasNextPage}
-    loading={isFetchingNextPage}
-    onLoadMore={fetchNextPage}
-  />
 </DataTable.Root>
 ```
-
-The component handles the loading trigger. Data fetching and caching remain outside the table.
 
 ## Row Selection
 
-Row selection can be enabled from the root component:
+Enable row selection:
 
 ```tsx
 <DataTable.Root
@@ -350,74 +399,221 @@ Row selection can be enabled from the root component:
 </DataTable.Root>
 ```
 
-Selection can also be controlled:
+Add a selection column:
 
 ```tsx
-<DataTable.Root
-  data={users}
-  columns={columns}
-  enableRowSelection
-  state={{ rowSelection }}
-  onRowSelectionChange={setRowSelection}
->
-  <DataTable.Table />
-</DataTable.Root>
+const columns: DataTableColumn<User>[] = [
+  {
+    id: 'select',
+    header: () => <DataTable.SelectionHeader />,
+    cell: ({ row }) => (
+      <DataTable.SelectionCell row={row} />
+    ),
+  },
+  {
+    accessorKey: 'name',
+    header: 'Name',
+  },
+]
+```
+
+Display actions for selected rows:
+
+```tsx
+<DataTable.BulkActions />
 ```
 
 ## Column Visibility
 
-Column visibility can be exposed through the built-in view options:
+Add a column visibility menu:
 
 ```tsx
-<DataTable.Root data={users} columns={columns}>
-  <DataTable.Header>
-    <DataTable.Toolbar>
-      <DataTable.ViewOptions />
-    </DataTable.Toolbar>
-  </DataTable.Header>
+<DataTable.ViewOptions />
+```
 
+Or:
+
+```tsx
+<DataTable.ColumnVisibility />
+```
+
+## Column Pinning
+
+Enable column pinning:
+
+```tsx
+<DataTable.Root
+  data={users}
+  columns={columns}
+  enableColumnPinning
+>
   <DataTable.Table />
 </DataTable.Root>
 ```
 
-Applications can also control visibility directly through table state.
-
-## Column Pinning
-
-Columns can be pinned through TanStack Table's column pinning state.
-
-The table exposes pinning as part of the reusable table state so applications can provide their own controls or use the built-in table options.
-
-## Expandable Rows
-
-Expandable rows can be enabled when the application provides nested or additional row content.
-
-The same table instance is used for expansion state, allowing expansion to work alongside sorting, filtering, pagination, and selection.
-
-## Fullscreen
-
-The table can be displayed as a fullscreen workspace:
+Use the pinning control:
 
 ```tsx
-<DataTable.Root data={data} columns={columns}>
-  <DataTable.Fullscreen>
-    <DataTable.Header>
-      <DataTable.Toolbar>
-        <DataTable.Search />
-        <DataTable.FullscreenButton />
-      </DataTable.Toolbar>
-    </DataTable.Header>
+<DataTable.Pinning columnId="name" />
+```
 
-    <DataTable.Table stickyHeader />
+## Column Resizing
 
-    <DataTable.Footer>
-      <DataTable.Pagination />
-    </DataTable.Footer>
-  </DataTable.Fullscreen>
+Enable column resizing:
+
+```tsx
+<DataTable.Root
+  data={users}
+  columns={columns}
+  enableColumnResizing
+>
+  <DataTable.Table />
 </DataTable.Root>
 ```
 
-The default strategy uses an overlay:
+Use resize updates at the end of the interaction:
+
+```tsx
+<DataTable.Root
+  data={users}
+  columns={columns}
+  enableColumnResizing
+  columnResizeMode="onEnd"
+>
+  <DataTable.Table />
+</DataTable.Root>
+```
+
+## Expandable Rows
+
+Enable expandable rows:
+
+```tsx
+<DataTable.Root
+  data={users}
+  columns={columns}
+  enableExpanding
+>
+  <DataTable.Table />
+</DataTable.Root>
+```
+
+Add an expand button:
+
+```tsx
+const columns: DataTableColumn<User>[] = [
+  {
+    id: 'expand',
+    header: '',
+    cell: ({ row }) => (
+      <DataTable.ExpandButton row={row} />
+    ),
+  },
+  {
+    accessorKey: 'name',
+    header: 'Name',
+  },
+]
+```
+
+## Infinite Scroll
+
+```tsx
+<DataTable.InfiniteScroll
+  hasMore={hasMore}
+  loading={loading}
+  onLoadMore={loadMore}
+/>
+```
+
+Customize the trigger:
+
+```tsx
+<DataTable.InfiniteScroll
+  hasMore={hasMore}
+  loading={loading}
+  onLoadMore={loadMore}
+  rootMargin="300px"
+  threshold={0}
+  label="Load more..."
+/>
+```
+
+## Loading State
+
+Display loading rows:
+
+```tsx
+<DataTable.Table loading />
+```
+
+Customize the number of loading rows:
+
+```tsx
+<DataTable.Table
+  loading
+  loadingRows={8}
+/>
+```
+
+## Empty State
+
+```tsx
+<DataTable.Table empty="No users found." />
+```
+
+Or:
+
+```tsx
+<DataTable.Empty>
+  No users found.
+</DataTable.Empty>
+```
+
+## Table Appearance
+
+### Striped rows
+
+```tsx
+<DataTable.Table striped />
+```
+
+### Sticky header
+
+```tsx
+<DataTable.Table stickyHeader />
+```
+
+### Density
+
+```tsx
+<DataTable.Table density="compact" />
+```
+
+Available density values:
+
+```text
+compact
+default
+comfortable
+```
+
+## Fullscreen
+
+```tsx
+<DataTable.Fullscreen>
+  <DataTable.Header>
+    <DataTable.Toolbar>
+      <DataTable.Search />
+      <DataTable.FullscreenButton />
+    </DataTable.Toolbar>
+  </DataTable.Header>
+
+  <DataTable.Table stickyHeader />
+</DataTable.Fullscreen>
+```
+
+Available strategies:
 
 ```tsx
 <DataTable.Fullscreen strategy="overlay">
@@ -425,7 +621,7 @@ The default strategy uses an overlay:
 </DataTable.Fullscreen>
 ```
 
-A native browser Fullscreen API mode is also available:
+or:
 
 ```tsx
 <DataTable.Fullscreen strategy="native">
@@ -433,16 +629,83 @@ A native browser Fullscreen API mode is also available:
 </DataTable.Fullscreen>
 ```
 
-Fullscreen keeps the existing table instance and state instead of creating a second table.
+## CSV Export
+
+Export table data:
+
+```tsx
+<DataTable.ExportCsv filename="users.csv" />
+```
+
+Provide custom rows:
+
+```tsx
+<DataTable.ExportCsv
+  filename="selected-users.csv"
+  getRows={() => selectedUsers}
+/>
+```
+
+## Row Count
+
+```tsx
+<DataTable.RowCount />
+```
+
+Customize the label:
+
+```tsx
+<DataTable.RowCount label="users" />
+```
+
+## Controlled State
+
+The table supports both internal and controlled state.
+
+You can control only the state your application needs:
+
+```tsx
+<DataTable.Root
+  data={users}
+  columns={columns}
+  state={{
+    sorting,
+    pagination,
+    rowSelection,
+  }}
+  onSortingChange={setSorting}
+  onPaginationChange={setPagination}
+  onRowSelectionChange={setRowSelection}
+>
+  <DataTable.Table />
+  <DataTable.Pagination />
+</DataTable.Root>
+```
+
+Supported state includes:
+
+- Sorting
+- Global filtering
+- Column filtering
+- Pagination
+- Row selection
+- Column visibility
+- Column ordering
+- Column pinning
+- Grouping
+- Expanded rows
 
 ## Custom Controls
 
-The table instance can be accessed through `useDataTable()`:
+Use `useDataTable()` to access the current table instance from a child component.
 
 ```tsx
-import { useDataTable } from '@/components/data-table'
+import {
+  DataTable,
+  useDataTable,
+} from 'coconut-composable-data-table'
 
-function ResetSortingButton() {
+function ResetSorting() {
   const { table } = useDataTable()
 
   return (
@@ -456,232 +719,168 @@ function ResetSortingButton() {
 }
 ```
 
-This allows applications to build custom controls around the same table state.
+Use it inside the table:
 
-## Project Structure
+```tsx
+<DataTable.Root data={users} columns={columns}>
+  <DataTable.Header>
+    <DataTable.Toolbar>
+      <ResetSorting />
+    </DataTable.Toolbar>
+  </DataTable.Header>
 
-The reusable table components are organized by responsibility:
-
-```text
-src/
-├── components/
-│   └── data-table/
-│       ├── core/
-│       │   ├── context.tsx
-│       │   ├── root.tsx
-│       │   └── index.ts
-│       │
-│       ├── controls/
-│       │   ├── search.tsx
-│       │   ├── column-filters.tsx
-│       │   ├── sort-button.tsx
-│       │   ├── menu-button.tsx
-│       │   ├── column-visibility.tsx
-│       │   ├── table-options.tsx
-│       │   └── index.ts
-│       │
-│       ├── display/
-│       │   ├── layout.tsx
-│       │   ├── table.tsx
-│       │   └── index.ts
-│       │
-│       ├── navigation/
-│       │   ├── pagination.tsx
-│       │   └── index.ts
-│       │
-│       ├── utilities/
-│       │   ├── selection.tsx
-│       │   ├── export-csv.tsx
-│       │   ├── density.tsx
-│       │   ├── infinite-scroll.tsx
-│       │   ├── column-pinning.tsx
-│       │   ├── row-count.tsx
-│       │   └── index.ts
-│       │
-│       ├── fullscreen/
-│       │   ├── fullscreen.tsx
-│       │   └── index.ts
-│       │
-│       ├── hooks/
-│       │   ├── menu-hooks.ts
-│       │   └── index.ts
-│       │
-│       └── index.ts
-│
-├── demo/
-├── docs/
-├── lib/
-├── styles/
-└── test/
-
-stories/
-└── DataTable.stories.tsx
+  <DataTable.Table />
+</DataTable.Root>
 ```
 
-The `components/data-table` directory contains the reusable table primitives. Demo, documentation, and test fixtures are kept separate from the package implementation.
+## Root Props
 
-## Architecture
+Only these props are required:
 
-TanStack Table provides the table state and row-model logic.
+| Prop | Type | Required | Description |
+| --- | --- | --- | --- |
+| `data` | `TData[]` | Yes | Data displayed by the table |
+| `columns` | `DataTableColumn<TData>[]` | Yes | Column definitions |
+| `children` | `ReactNode` | No | Composable table content |
 
-The component layer is responsible for rendering semantic table markup and providing reusable controls around the table instance.
+Common optional props:
 
-The main relationship is:
+| Prop | Type | Description |
+| --- | --- | --- |
+| `className` | `string` | Custom root class |
+| `initialState` | `DataTableInitialState` | Initial table state |
+| `state` | `Partial<TableState>` | Controlled table state |
+| `onSortingChange` | handler | Sorting state callback |
+| `onColumnFiltersChange` | handler | Column filter callback |
+| `onColumnVisibilityChange` | handler | Column visibility callback |
+| `onRowSelectionChange` | handler | Row selection callback |
+| `onPaginationChange` | handler | Pagination callback |
+| `onGlobalFilterChange` | handler | Global filter callback |
+| `onExpandedChange` | handler | Expanded row callback |
+| `onGroupingChange` | handler | Grouping callback |
+| `onColumnPinningChange` | handler | Column pinning callback |
+| `onColumnOrderChange` | handler | Column order callback |
+| `manualPagination` | `boolean` | Enable server-side/manual pagination |
+| `manualSorting` | `boolean` | Enable server-side/manual sorting |
+| `manualFiltering` | `boolean` | Enable server-side/manual filtering |
+| `manualGrouping` | `boolean` | Enable server-side/manual grouping |
+| `manualExpanding` | `boolean` | Enable server-side/manual expanding |
+| `pageCount` | `number` | Total page count for manual pagination |
+| `rowCount` | `number` | Total row count for manual pagination |
+| `enableRowSelection` | `boolean \| function` | Enable row selection |
+| `enableMultiRowSelection` | `boolean \| function` | Enable multi-row selection |
+| `enableSubRowSelection` | `boolean \| function` | Enable sub-row selection |
+| `enableExpanding` | `boolean \| function` | Enable expandable rows |
+| `enableColumnResizing` | `boolean` | Enable column resizing |
+| `enableColumnPinning` | `boolean` | Enable column pinning |
+| `columnResizeMode` | `'onChange' \| 'onEnd'` | Resize update strategy |
+
+All non-essential props are optional.
+
+## Available Components
+
+### Core
 
 ```text
-Application
-    │
-    ▼
 DataTable.Root
-    │
-    ├── shared table instance
-    │
-    ├── Header / Toolbar
-    │       ├── Search
-    │       ├── Filters
-    │       └── View Options
-    │
-    ├── Table
-    │
-    └── Footer
-            └── Pagination
+DataTable.Table
+DataTable.Header
+DataTable.Toolbar
+DataTable.Actions
+DataTable.Footer
+DataTable.Caption
+DataTable.Empty
+DataTable.Loading
 ```
 
-For more detail about state ownership and component boundaries, see:
+### Search & Filtering
 
 ```text
-docs/ARCHITECTURE.md
+DataTable.Search
+DataTable.Filter
+DataTable.ColumnFilter
+DataTable.FacetedFilter
+DataTable.FilterRow
+DataTable.ClearFilters
 ```
 
-## Development
-
-Install dependencies:
-
-```bash
-npm install
-```
-
-Start the development server:
-
-```bash
-npm run dev
-```
-
-Then open:
+### Sorting
 
 ```text
-http://localhost:5173/
+DataTable.SortButton
 ```
 
-Documentation:
+### Pagination
 
 ```text
-http://localhost:5173/docs
+DataTable.Pagination
 ```
 
-## Storybook
+### Selection
 
-Start Storybook:
-
-```bash
-npm run storybook
+```text
+DataTable.SelectionCell
+DataTable.SelectionHeader
+DataTable.BulkActions
 ```
 
-Build Storybook:
+### Columns
 
-```bash
-npm run build-storybook
+```text
+DataTable.ViewOptions
+DataTable.ColumnVisibility
+DataTable.Pinning
+DataTable.ResizeHandle
 ```
 
-## Testing
+### Rows
 
-The project uses Vitest and Testing Library.
-
-Run the test suite:
-
-```bash
-npm test
+```text
+DataTable.ExpandButton
+DataTable.InfiniteScroll
+DataTable.RowCount
 ```
 
-The tests focus on user-visible behavior such as:
+### Utilities
 
-- pagination
-- global search
-- column filtering
-- faceted filtering
-- sorting
-- selection
-- column visibility
-- fullscreen behavior
-
-## Quality Checks
-
-Type checking:
-
-```bash
-npm run typecheck
+```text
+DataTable.ExportCsv
+DataTable.Density
+DataTable.Reset
+DataTable.TableOptions
 ```
 
-Linting:
+### Fullscreen
 
-```bash
-npm run lint
+```text
+DataTable.Fullscreen
+DataTable.FullscreenButton
 ```
 
-Production build:
+## TypeScript
 
-```bash
-npm run build
+Public types are available directly from the package:
+
+```tsx
+import type {
+  DataTableColumn,
+  DataTableRootProps,
+  DataTablePaginationProps,
+} from 'coconut-composable-data-table'
 ```
 
-Storybook build:
+## Styling
 
-```bash
-npm run build-storybook
-```
-
-Run the complete check:
-
-```bash
-npm run ci
-```
-
-## Package
-
-The reusable library can be built separately from the demo application:
-
-```bash
-npm run build:package
-```
-
-The package exposes the `DataTable` components and stylesheet.
-
-Example:
+Import the default stylesheet once:
 
 ```tsx
 import 'coconut-composable-data-table/styles.css'
-import { DataTable } from 'coconut-composable-data-table'
 ```
 
-## Reference
+Components also expose `className` where customization is useful.
 
-The implementation uses the TanStack Table v8 API.
+You can override the default styles with your application's CSS.
 
-The initial table implementation follows the concepts demonstrated in the TanStack Table Basic Table example:
+## License
 
-https://tanstack.com/table/latest/docs/framework/react/examples/basic-use-table
-
-## Notes
-
-The repository contains both the reusable component library and a reference application.
-
-The demo and documentation use local fixture data so the table interactions can be explored without requiring an external API.
-
-For additional information:
-
-- `SUBMISSION.md` — reviewer guide and main design decisions
-- `docs/API.md` — public API
-- `docs/ARCHITECTURE.md` — architecture and state ownership
-- `docs/CONTRIBUTING.md` — development workflow
-- `docs/PUBLISHING.md` — package publishing
-- `CHANGELOG.md` — release history
+MIT
