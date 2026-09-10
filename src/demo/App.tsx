@@ -1,4 +1,4 @@
-import { BookOpen, CheckCircle2 } from 'lucide-react'
+import { BookOpen, CheckCircle2, Github, Package } from 'lucide-react'
 import { ApiCoverageExample } from '@/examples/ApiCoverageExample'
 import { ProjectTableExample } from '@/examples/ProjectTableExample'
 
@@ -35,6 +35,25 @@ export function App() {
             <div className="hero-actions">
               <a className="hero-docs-link" href="/docs">
                 <BookOpen size={15} /> Open component docs
+              </a>
+              <a
+                className="hero-docs-link"
+                href="https://www.npmjs.com/package/coconut-composable-data-table"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <Package size={15} />
+                NPM package
+              </a>
+
+              <a
+                className="hero-docs-link"
+                href="https://github.com/febri867/composable-data-table"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <Github size={15} />
+                GitHub
               </a>
             </div>
           </div>

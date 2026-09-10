@@ -1290,6 +1290,7 @@ html {
 .hero-actions {
   display: flex;
   margin-top: 24px;
+  gap: 12px;
 }
 .hero-docs-link,
 .demo-docs-link {
