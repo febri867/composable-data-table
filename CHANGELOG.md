@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here.
 
+## [0.1.12]
+
+### Documentation
+
+- Updated the Full Feature Example to use the complete `ProjectTableExample`.
+- Added 15 mock project records so the example can be copied and run directly.
+
 ## [0.1.11]
 
 ### Documentation
