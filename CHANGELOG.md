@@ -2,6 +2,15 @@
 
 All notable changes to this project are documented here.
 
+## [0.1.11]
+
+### Documentation
+
+- Added a full-featured `ProjectDataExample` to the README.
+- Added 15 realistic mock project records for demonstrating the table API.
+- Documented a complete consumer example using only `coconut-composable-data-table`.
+- Demonstrated search, faceted filtering, selection, column resizing, column pinning, visibility controls, CSV export, reset, striped rows, sticky headers, density, row count, and pagination.
+
 ## [0.1.10]
 
 ### Fixed

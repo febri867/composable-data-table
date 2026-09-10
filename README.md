@@ -857,6 +857,168 @@ DataTable.Fullscreen
 DataTable.FullscreenButton
 ```
 
+
+## Full Feature Example
+
+The following example demonstrates a more complete table built only with
+`coconut-composable-data-table`.
+
+It does not require a separate table library, icon library, UI library, or
+other component library. The table components, state management hooks, and
+controls come from this package.
+
+### Mock data
+
+```tsx
+type Project = {
+  id: string
+  name: string
+  owner: string
+  email: string
+  status: 'Active' | 'Planning' | 'Completed' | 'Archived'
+  priority: 'Low' | 'Medium' | 'High'
+  progress: number
+  teamSize: number
+  budget: number
+  dueDate: string
+}
+
+const projects: Project[] = [
+  { id: 'PRJ-001', name: 'Website Redesign', owner: 'Sarah Chen', email: 'sarah@example.com', status: 'Active', priority: 'High', progress: 72, teamSize: 8, budget: 48000, dueDate: '2026-09-18' },
+  { id: 'PRJ-002', name: 'Mobile Application', owner: 'Michael Brown', email: 'michael@example.com', status: 'Active', priority: 'High', progress: 61, teamSize: 10, budget: 72000, dueDate: '2026-10-02' },
+  { id: 'PRJ-003', name: 'Design System', owner: 'Emily Davis', email: 'emily@example.com', status: 'Completed', priority: 'Medium', progress: 100, teamSize: 5, budget: 32000, dueDate: '2026-08-28' },
+  { id: 'PRJ-004', name: 'Analytics Dashboard', owner: 'David Wilson', email: 'david@example.com', status: 'Planning', priority: 'Medium', progress: 24, teamSize: 6, budget: 41000, dueDate: '2026-10-20' },
+  { id: 'PRJ-005', name: 'Payment Integration', owner: 'Olivia Taylor', email: 'olivia@example.com', status: 'Active', priority: 'High', progress: 83, teamSize: 4, budget: 27000, dueDate: '2026-09-14' },
+  { id: 'PRJ-006', name: 'Customer Portal', owner: 'James Anderson', email: 'james@example.com', status: 'Planning', priority: 'Low', progress: 15, teamSize: 7, budget: 39000, dueDate: '2026-11-05' },
+  { id: 'PRJ-007', name: 'Internal Tools', owner: 'Sophia Martin', email: 'sophia@example.com', status: 'Active', priority: 'Medium', progress: 48, teamSize: 5, budget: 22000, dueDate: '2026-09-30' },
+  { id: 'PRJ-008', name: 'API Modernization', owner: 'Daniel Moore', email: 'daniel@example.com', status: 'Completed', priority: 'High', progress: 100, teamSize: 9, budget: 65000, dueDate: '2026-08-15' },
+  { id: 'PRJ-009', name: 'Onboarding Flow', owner: 'Ava Jackson', email: 'ava@example.com', status: 'Active', priority: 'Medium', progress: 67, teamSize: 3, budget: 18000, dueDate: '2026-09-25' },
+  { id: 'PRJ-010', name: 'Reporting Service', owner: 'William Harris', email: 'william@example.com', status: 'Archived', priority: 'Low', progress: 100, teamSize: 4, budget: 21000, dueDate: '2026-07-30' },
+  { id: 'PRJ-011', name: 'Search Platform', owner: 'Mia Thompson', email: 'mia@example.com', status: 'Active', priority: 'High', progress: 54, teamSize: 8, budget: 56000, dueDate: '2026-10-12' },
+  { id: 'PRJ-012', name: 'Notification Center', owner: 'Ethan Garcia', email: 'ethan@example.com', status: 'Planning', priority: 'Medium', progress: 8, teamSize: 4, budget: 16000, dueDate: '2026-11-18' },
+  { id: 'PRJ-013', name: 'Access Management', owner: 'Isabella Martinez', email: 'isabella@example.com', status: 'Active', priority: 'High', progress: 76, teamSize: 6, budget: 44000, dueDate: '2026-09-21' },
+  { id: 'PRJ-014', name: 'Data Importer', owner: 'Lucas Robinson', email: 'lucas@example.com', status: 'Completed', priority: 'Low', progress: 100, teamSize: 3, budget: 14000, dueDate: '2026-08-05' },
+  { id: 'PRJ-015', name: 'Workspace Management', owner: 'Charlotte Lee', email: 'charlotte@example.com', status: 'Active', priority: 'Medium', progress: 39, teamSize: 7, budget: 35000, dueDate: '2026-10-28' },
+]
+```
+
+### Full example
+
+```tsx
+import 'coconut-composable-data-table/styles.css'
+
+import {
+  DataTable,
+  type DataTableColumn,
+} from 'coconut-composable-data-table'
+
+const columns: DataTableColumn<Project>[] = [
+  {
+    accessorKey: 'id',
+    header: 'ID',
+    size: 110,
+  },
+  {
+    accessorKey: 'name',
+    header: 'Project',
+    size: 220,
+  },
+  {
+    accessorKey: 'owner',
+    header: 'Owner',
+    size: 180,
+  },
+  {
+    accessorKey: 'email',
+    header: 'Email',
+    size: 220,
+  },
+  {
+    accessorKey: 'status',
+    header: 'Status',
+    filterFn: 'arrIncludesSome',
+  },
+  {
+    accessorKey: 'priority',
+    header: 'Priority',
+    filterFn: 'arrIncludesSome',
+  },
+  {
+    accessorKey: 'progress',
+    header: 'Progress',
+    cell: ({ getValue }) => `${getValue<number>()}%`,
+  },
+  {
+    accessorKey: 'teamSize',
+    header: 'Team',
+  },
+  {
+    accessorKey: 'budget',
+    header: 'Budget',
+    cell: ({ getValue }) =>
+      `$${getValue<number>().toLocaleString()}`,
+  },
+  {
+    accessorKey: 'dueDate',
+    header: 'Due Date',
+  },
+]
+
+export function ProjectDataExample() {
+  return (
+    <DataTable.Root
+      data={projects}
+      columns={columns}
+      enableRowSelection
+      enableColumnResizing
+      enableColumnPinning
+    >
+      <DataTable.Header>
+        <DataTable.Toolbar>
+          <DataTable.Search placeholder="Search projects..." />
+
+          <DataTable.FacetedFilter
+            columnId="status"
+            label="Status"
+          />
+
+          <DataTable.FacetedFilter
+            columnId="priority"
+            label="Priority"
+          />
+
+          <DataTable.ClearFilters />
+
+          <DataTable.ViewOptions />
+
+          <DataTable.ExportCsv filename="projects.csv" />
+
+          <DataTable.Reset />
+        </DataTable.Toolbar>
+      </DataTable.Header>
+
+      <DataTable.Table
+        striped
+        stickyHeader
+        density="comfortable"
+      />
+
+      <DataTable.Footer>
+        <DataTable.RowCount label="projects" />
+
+        <DataTable.Pagination
+          pageSizeOptions={[5, 10, 15, 25]}
+        />
+      </DataTable.Footer>
+    </DataTable.Root>
+  )
+}
+```
+
+This example demonstrates that a consumer can combine the package's
+composable primitives into a feature-rich table while keeping the application
+data and column definitions fully under the consumer's control.
+
 ## TypeScript
 
 Public types are available directly from the package:

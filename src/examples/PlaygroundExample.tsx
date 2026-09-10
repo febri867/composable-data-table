@@ -1,31 +1,15 @@
 import { useMemo, useState } from 'react'
-import {
-  createColumnHelper,
-  type ColumnDef,
-  type FilterFn,
-  type PaginationState,
-  type RowSelectionState,
-  type SortingState,
-  type VisibilityState,
-} from '@tanstack/react-table'
-import { DataTable } from '@/components/data-table'
+import { DataTable, type DataTableColumn } from '@/components/data-table'
 import { playgroundData, type PlaygroundUser } from './data'
 
-const helper = createColumnHelper<PlaygroundUser>()
-const multiSelect: FilterFn<PlaygroundUser> = (row, columnId, value) => {
-  const values = Array.isArray(value) ? value.map(String) : [String(value)]
-  return values.includes(String(row.getValue(columnId)))
-}
-const globalSearch: FilterFn<PlaygroundUser> = (row, _id, value) => {
-  const query = String(value ?? '')
-    .trim()
-    .toLowerCase()
-  if (!query) return true
-  return Object.values(row.original).join(' ').toLowerCase().includes(query)
-}
+type PaginationState = { pageIndex: number; pageSize: number }
+type SortingState = Array<{ id: string; desc: boolean }>
+type RowSelectionState = Record<string, boolean>
+type VisibilityState = Record<string, boolean>
+type ColumnFiltersState = Array<{ id: string; value: unknown }>
 
-const columns: ColumnDef<PlaygroundUser, any>[] = [
-  helper.display({
+const columns: DataTableColumn<PlaygroundUser>[] = [
+  {
     id: 'select',
     enableHiding: false,
     enableSorting: false,
@@ -33,8 +17,9 @@ const columns: ColumnDef<PlaygroundUser, any>[] = [
     header: () => <DataTable.SelectionHeader />,
     cell: ({ row }) => <DataTable.SelectionCell row={row} />,
     size: 46,
-  }),
-  helper.accessor('id', {
+  },
+  {
+    accessorKey: 'id',
     header: () => (
       <div className="header-with-filter">
         <DataTable.SortButton columnId="id" label="ID" />
@@ -43,8 +28,9 @@ const columns: ColumnDef<PlaygroundUser, any>[] = [
     ),
     size: 105,
     filterFn: 'includesString',
-  }),
-  helper.accessor('name', {
+  },
+  {
+    accessorKey: 'name',
     header: () => (
       <div className="header-with-filter">
         <DataTable.SortButton columnId="name" label="Name" />
@@ -53,8 +39,9 @@ const columns: ColumnDef<PlaygroundUser, any>[] = [
     ),
     size: 180,
     filterFn: 'includesString',
-  }),
-  helper.accessor('email', {
+  },
+  {
+    accessorKey: 'email',
     header: () => (
       <div className="header-with-filter">
         <DataTable.SortButton columnId="email" label="Email" />
@@ -63,35 +50,37 @@ const columns: ColumnDef<PlaygroundUser, any>[] = [
     ),
     size: 250,
     filterFn: 'includesString',
-  }),
-  helper.accessor('role', {
+  },
+  {
+    accessorKey: 'role',
     header: () => <DataTable.SortButton columnId="role" label="Role" />,
     size: 125,
-    filterFn: multiSelect,
-  }),
-  helper.accessor('status', {
+    filterFn: 'arrIncludesSome',
+  },
+  {
+    accessorKey: 'status',
     header: () => <DataTable.SortButton columnId="status" label="Status" />,
     size: 125,
-    filterFn: multiSelect,
-  }),
-  helper.accessor('team', {
+    filterFn: 'arrIncludesSome',
+  },
+  {
+    accessorKey: 'team',
     header: () => <DataTable.SortButton columnId="team" label="Team" />,
     size: 125,
-    filterFn: multiSelect,
-  }),
-  helper.accessor('score', {
+    filterFn: 'arrIncludesSome',
+  },
+  {
+    accessorKey: 'score',
     header: () => <DataTable.SortButton columnId="score" label="Score" />,
     size: 100,
     filterFn: 'inNumberRange',
-  }),
+  },
 ]
 
 export function PlaygroundExample() {
   const [selection, setSelection] = useState<RowSelectionState>({})
   const [sorting, setSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = useState<
-    { id: string; value: unknown }[]
-  >([])
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [globalFilter, setGlobalFilter] = useState('')
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -181,7 +170,6 @@ export function PlaygroundExample() {
         onColumnVisibilityChange={setVisibility}
         manualPagination={mode === 'infinite'}
         rowCount={mode === 'infinite' ? loadedCount : undefined}
-        globalFilterFn={globalSearch}
         meta={{ density, setDensity }}
       >
         <DataTable.Header>

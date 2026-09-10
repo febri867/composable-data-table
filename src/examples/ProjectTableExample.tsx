@@ -1,14 +1,15 @@
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
 import {
-  createColumnHelper,
-  type ColumnDef,
-  type FilterFn,
-  type PaginationState,
-  type RowSelectionState,
-  type SortingState,
-  type VisibilityState,
-} from '@tanstack/react-table'
+  JSXElementConstructor,
+  ReactElement,
+  ReactNode,
+  ReactPortal,
+  useCallback,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
+import { createPortal } from 'react-dom'
 import {
   CheckCircle2,
   ExternalLink,
@@ -18,7 +19,7 @@ import {
   Trash2,
   X,
 } from 'lucide-react'
-import { DataTable } from '@/components/data-table'
+import { DataTable, type DataTableColumn } from '@/components/data-table'
 import {
   projectData,
   type Project,
@@ -26,30 +27,11 @@ import {
   type WorkLocation,
 } from './data'
 
-const helper = createColumnHelper<Project>()
-const arrayIncludesSome: FilterFn<Project> = (row, columnId, filterValue) => {
-  const selected = Array.isArray(filterValue)
-    ? filterValue.map(String)
-    : [String(filterValue)]
-  return selected.includes(String(row.getValue(columnId)))
-}
-const projectGlobalFilter: FilterFn<Project> = (row, _columnId, value) => {
-  const query = String(value ?? '')
-    .trim()
-    .toLowerCase()
-  if (!query) return true
-  return [
-    row.original.owner,
-    row.original.role,
-    row.original.city,
-    row.original.location,
-    row.original.project,
-    row.original.status,
-  ]
-    .join(' ')
-    .toLowerCase()
-    .includes(query)
-}
+type PaginationState = { pageIndex: number; pageSize: number }
+type SortingState = Array<{ id: string; desc: boolean }>
+type RowSelectionState = Record<string, boolean>
+type VisibilityState = Record<string, boolean>
+type ColumnFiltersState = Array<{ id: string; value: unknown }>
 
 function StatusBadge({ status }: { status: ProjectStatus }) {
   return (
@@ -394,9 +376,7 @@ export function ProjectTableExample() {
   const [rows, setRows] = useState(projectData)
   const [selection, setSelection] = useState<RowSelectionState>({})
   const [sorting, setSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = useState<
-    { id: string; value: unknown }[]
-  >([])
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [globalFilter, setGlobalFilter] = useState('')
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -427,9 +407,9 @@ export function ProjectTableExample() {
     [notify],
   )
 
-  const columns = useMemo<ColumnDef<Project, any>[]>(
+  const columns = useMemo<DataTableColumn<Project>[]>(
     () => [
-      helper.display({
+      {
         id: '__expander',
         enableHiding: false,
         enableSorting: false,
@@ -438,7 +418,94 @@ export function ProjectTableExample() {
         cell: ({ row }) => <DataTable.ExpandButton row={row} />,
         size: 38,
         meta: {
-          renderExpanded: (row: any) => (
+          renderExpanded: (row: {
+            original: {
+              owner:
+                | string
+                | number
+                | bigint
+                | boolean
+                | ReactElement<unknown, string | JSXElementConstructor<any>>
+                | Iterable<ReactNode>
+                | ReactPortal
+                | Promise<
+                    | string
+                    | number
+                    | bigint
+                    | boolean
+                    | ReactPortal
+                    | ReactElement<unknown, string | JSXElementConstructor<any>>
+                    | Iterable<ReactNode>
+                    | null
+                    | undefined
+                  >
+                | null
+                | undefined
+              role:
+                | string
+                | number
+                | bigint
+                | boolean
+                | ReactElement<unknown, string | JSXElementConstructor<any>>
+                | Iterable<ReactNode>
+                | ReactPortal
+                | Promise<
+                    | string
+                    | number
+                    | bigint
+                    | boolean
+                    | ReactPortal
+                    | ReactElement<unknown, string | JSXElementConstructor<any>>
+                    | Iterable<ReactNode>
+                    | null
+                    | undefined
+                  >
+                | null
+                | undefined
+              city:
+                | string
+                | number
+                | bigint
+                | boolean
+                | ReactElement<unknown, string | JSXElementConstructor<any>>
+                | Iterable<ReactNode>
+                | ReactPortal
+                | Promise<
+                    | string
+                    | number
+                    | bigint
+                    | boolean
+                    | ReactPortal
+                    | ReactElement<unknown, string | JSXElementConstructor<any>>
+                    | Iterable<ReactNode>
+                    | null
+                    | undefined
+                  >
+                | null
+                | undefined
+              progress:
+                | string
+                | number
+                | bigint
+                | boolean
+                | ReactElement<unknown, string | JSXElementConstructor<any>>
+                | Iterable<ReactNode>
+                | ReactPortal
+                | Promise<
+                    | string
+                    | number
+                    | bigint
+                    | boolean
+                    | ReactPortal
+                    | ReactElement<unknown, string | JSXElementConstructor<any>>
+                    | Iterable<ReactNode>
+                    | null
+                    | undefined
+                  >
+                | null
+                | undefined
+            }
+          }) => (
             <div className="expanded-project">
               <strong>{row.original.owner}</strong>
               <span>
@@ -448,8 +515,8 @@ export function ProjectTableExample() {
             </div>
           ),
         },
-      }),
-      helper.display({
+      },
+      {
         id: 'select',
         enableHiding: false,
         enableSorting: false,
@@ -457,8 +524,9 @@ export function ProjectTableExample() {
         header: () => <DataTable.SelectionHeader />,
         cell: ({ row }) => <DataTable.SelectionCell row={row} />,
         size: 48,
-      }),
-      helper.accessor('owner', {
+      },
+      {
+        accessorKey: 'owner',
         header: () => (
           <div className="header-with-filter">
             <DataTable.SortButton columnId="owner" label="Owner" />
@@ -485,8 +553,9 @@ export function ProjectTableExample() {
         ),
         size: 230,
         filterFn: 'includesString',
-      }),
-      helper.accessor('city', {
+      },
+      {
+        accessorKey: 'city',
         header: () => (
           <div className="header-with-filter">
             <DataTable.SortButton columnId="city" label="City" />
@@ -495,8 +564,9 @@ export function ProjectTableExample() {
         ),
         size: 125,
         filterFn: 'includesString',
-      }),
-      helper.accessor('location', {
+      },
+      {
+        accessorKey: 'location',
         header: () => (
           <div className="header-with-filter">
             <DataTable.SortButton columnId="location" label="Work Location" />
@@ -506,7 +576,7 @@ export function ProjectTableExample() {
         cell: ({ row, getValue }) => (
           <select
             className="inline-select"
-            value={getValue()}
+            value={getValue() as WorkLocation}
             onChange={(event) =>
               setRows((current) =>
                 current.map((item) =>
@@ -523,35 +593,40 @@ export function ProjectTableExample() {
           </select>
         ),
         size: 150,
-        filterFn: arrayIncludesSome,
-      }),
-      helper.accessor('project', {
+        filterFn: 'arrIncludesSome',
+      },
+      {
+        accessorKey: 'project',
         header: () => <span>Project Link</span>,
         cell: ({ getValue }) => (
           <a
             className="project-link"
-            href={`https://${getValue()}`}
+            href={`https://${getValue() as string}`}
             target="_blank"
             rel="noreferrer"
           >
-            {getValue()} <ExternalLink size={12} />
+            {getValue() as string} <ExternalLink size={12} />
           </a>
         ),
         enableSorting: false,
         size: 180,
-      }),
-      helper.accessor('status', {
+      },
+      {
+        accessorKey: 'status',
         header: () => (
           <div className="header-with-filter">
             <DataTable.SortButton columnId="status" label="Status" />
             <DataTable.ColumnFilter columnId="status" />
           </div>
         ),
-        cell: ({ getValue }) => <StatusBadge status={getValue()} />,
+        cell: ({ getValue }) => (
+          <StatusBadge status={getValue() as ProjectStatus} />
+        ),
         size: 130,
-        filterFn: arrayIncludesSome,
-      }),
-      helper.accessor('progress', {
+        filterFn: 'arrIncludesSome',
+      },
+      {
+        accessorKey: 'progress',
         header: () => (
           <div className="header-with-filter">
             <DataTable.SortButton columnId="progress" label="Progress" />
@@ -561,22 +636,25 @@ export function ProjectTableExample() {
         cell: ({ getValue }) => (
           <div className="progress-cell">
             <span>
-              <span style={{ width: `${getValue()}%` }} />
+              <span style={{ width: `${getValue() as number}%` }} />
             </span>
-            <strong>{getValue()}%</strong>
+            <strong>{getValue() as number}%</strong>
           </div>
         ),
         size: 130,
         filterFn: 'inNumberRange',
-      }),
-      helper.accessor('members', {
+      },
+      {
+        accessorKey: 'members',
         header: () => <span>Team Members</span>,
         enableSorting: false,
         enableColumnFilter: false,
-        cell: ({ getValue }) => <AvatarStack people={getValue()} />,
+        cell: ({ getValue }) => (
+          <AvatarStack people={getValue() as Project['members']} />
+        ),
         size: 170,
-      }),
-      helper.display({
+      },
+      {
         id: 'actions',
         enableHiding: false,
         enableSorting: false,
@@ -610,7 +688,7 @@ export function ProjectTableExample() {
           />
         ),
         size: 150,
-      }),
+      },
     ],
     [copyLink, notify],
   )
@@ -640,7 +718,6 @@ export function ProjectTableExample() {
         onColumnVisibilityChange={setVisibility}
         initialState={{ pagination: { pageIndex: 0, pageSize: 10 } }}
         meta={{ density, setDensity }}
-        globalFilterFn={projectGlobalFilter}
       >
         <DataTable.Fullscreen>
           <DataTable.Header>
